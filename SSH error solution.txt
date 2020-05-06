@@ -1,0 +1,23 @@
+ERROR:EC2 ssh Permission denied (publickey,gssapi-keyex,gssapi-with-mic)
+-------------------------------------------------------------------
+set user password 
+sudo passwd ec2-user
+passwd :welcome
+---------------
+Login in root account 
+copy the /etc/ssh/sshd_config to /etc/ssh/sshd_config.bak the edit the cfile 
+#/etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+vi /etc/ssh/sshd_config.bak
+permitRootLogin yes (Uncomment line ,set to 'yes')
+PasswordAuthentication yes (Uncomment line ,set to 'yes')
+save the file and run the bellow command 
+-----------------
+sshd -t
+(if no out put returned, proceed. if there are any error correct them)
+restart the sshd service 
+------------
+systemctl sshd restart
+
+
+END 
+ 
