@@ -1,0 +1,17 @@
+git init  (it will make git)
+git status 
+git add .
+git commit -m 'first commit'
+git push origin master ( if get error)
+git remote -v  (check remote is added or not )
+git remote add origin https://github.com/totalmog/abhidev.git
+git remote -v
+it will show 
+--------------
+origin  https://github.com/totalmog/abhidev.git (fetch)
+origin  https://github.com/totalmog/abhidev.git (push)
+Now add
+--------
+git push origin master
+
+# check now your remote repository

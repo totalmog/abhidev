@@ -1,0 +1,91 @@
+Nexus server installation in aws Ec2
+-------------------------------------
+pre requisite softwares
+-----------------------
+sudo yum update 
+yum list | grep java-1.8.0
+java-1.8.0-openjdk.x86_64 
+yum install java 1.8.0-openjdk
+java -version
+port-8081
+
+H/W Requirments
+----------------
+2 cpu & 2 Gb Ram  (free -h,lscpu)
+
+cd /opt
+ls , pwd
+sudo yum install tar wget 
+sudo wget https://download.sonatype.com/nexus/3/latest-unix.tar.gz
+ls, untar the file  
+sudo tar -zxvf latest-unix.tar.gz 
+ls 
+change the folder name 
+sudo mv /opt/nexus-3.22.1-02 /opt/nexus
+create user to goood for use
+============================
+ sudo useradd abhiram
+give the visudo access 
+root    ALL=(ALL)       ALL
+abhiram ALL=(ALL)       NOPASSWD: ALL
+# change the ownership 
+# ls -ltr
+-rw-r--r--. 1 root root 143228922 Apr 16 14:06 latest-unix.tar.gz
+drwxr-xr-x. 9 root root       163 May  5 10:08 nexus
+drwxr-xr-x. 3 root root        20 May  5 10:08 sonatype-work
+chown -R abhiram:abhiram /opt/nexus/
+chown -R abhiram:abhiram /opt/sonatype-work/
+# ls -ltr
+-rw-r--r--. 1 root    root    143228922 Apr 16 14:06 latest-unix.tar.gz
+drwxr-xr-x. 9 abhiram abhiram       163 May  5 10:08 nexus
+drwxr-xr-x. 3 abhiram abhiram        20 May  5 10:08 sonatype-work
+Change the permision 
+=====================
+[root@ip-172-16-1-127 opt]# chmod -R 775 /opt/nexus/
+[root@ip-172-16-1-127 opt]# chmod -R 775 /opt/sonatype-work/
+[root@ip-172-16-1-127 opt]# ls -ltr
+total 139872
+-rw-r--r--. 1 root    root    143228922 Apr 16 14:06 latest-unix.tar.gz
+drwxrwxr-x. 9 abhiram abhiram       163 May  5 10:08 nexus
+drwxrwxr-x. 3 abhiram abhiram        20 May  5 10:08 sonatype-work
+Now opn the nexus.rc file and assign user name 
+-----------------------------------------------
+[root@ip-172-16-1-127 opt]# cd nexus/
+[root@ip-172-16-1-127 nexus]# ls
+bin     etc  NOTICE.txt       PRO-LICENSE.txt  system
+deploy  lib  OSS-LICENSE.txt  public
+[root@ip-172-16-1-127 nexus]# cd bin
+[root@ip-172-16-1-127 bin]# ls
+contrib  nexus  nexus.rc  nexus.vmoptions
+[root@ip-172-16-1-127 bin]# vi nexus.rc
+run_as_user="abhiram"
+Create a service (soft link)
+--------------------------
+ ln -s /opt/nexus/bin/nexus /etc/init.d/nexus
+switch the user
+------------------------ 
+ su abhiram
+[abhiram@ip-172-16-1-127 etc]$ whoami
+abhiram
+
+Enable the service 
+-----------------------
+sudo systemctl enable nexus
+sudo systemctl start nexus
+sudo systemctl status nexus 
+or 
+[abhiram@ip-172-16-1-127 etc]$ sudo chkconfig --add nexus
+[abhiram@ip-172-16-1-127 etc]$ sudo chkconfig nexus on
+[abhiram@ip-172-16-1-127 etc]$ sudo service nexus start
+Last login: Tue May  5 10:54:17 UTC 2020 on pts/2
+Starting nexus
+http://3.81.163.219:8081/ or sudo curl http://3.81.163.219:8081/
+
+Troubleshoot 
+===========
+Nexus service is not starting 
+Make sure need to chage the ownwership and group 
+
+
+
+
