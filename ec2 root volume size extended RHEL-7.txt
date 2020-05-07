@@ -15,7 +15,7 @@ tmpfs           495M     0  495M   0% /sys/fs/cgroup
 /dev/xvda2       10G  944M  9.1G  10% /  ----------------------->Here 10GB
 tmpfs            99M     0   99M   0% /run/user/1000
 --------------------------------------
-[root@ip-172-16-1-41 ~]# lsblk           (lsblk -lf)
+[root@ip-172-16-1-41 ~]# lsblk           (lsblk -lf)or lsblk -f
 NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
 xvda    202:0    0  12G  0 disk  --------------------------> Here 12gb we need to  expand it 
 ├─xvda1 202:1    0   1M  0 part
