@@ -1,0 +1,106 @@
+DISK PARTITION ON AWS RHEL 7 
+=================================
+[root@ip-172-16-1-40 ec2-user]# clear
+[root@ip-172-16-1-40 ec2-user]# fdisk -l
+Disk /dev/xvda: 10 GiB, 10737418240 bytes, 20971520 sectors
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disklabel type: dos
+Disk identifier: 0xd00a186f
+
+Device     Boot Start      End  Sectors Size Id Type
+/dev/xvda1       2048     4095     2048   1M 83 Linux
+/dev/xvda2 *     4096 20971486 20967391  10G 83 Linux
+[root@ip-172-16-1-40 ec2-user]#
+---------------------------------------
+[root@ip-172-16-1-40 ec2-user]# lsblk
+NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+xvda    202:0    0  10G  0 disk
+├─xvda1 202:1    0   1M  0 part
+└─xvda2 202:2    0  10G  0 part /
+[root@ip-172-16-1-40 ec2-user]#
+
+Now attach the ebs Volume 
+--------------------------
+Select volume -->Action -->Attach 
+[ec2-user@ip-172-16-1-40 ~]$ lsblk
+NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+xvda    202:0    0  10G  0 disk
+├─xvda1 202:1    0   1M  0 part
+└─xvda2 202:2    0  10G  0 part /
+xvdf    202:80   0   5G  0 disk   ==============> New added disk 
+[ec2-user@ip-172-16-1-40 ~]$
+check now it is showing or not 
+--------------------------------
+[ec2-user@ip-172-16-1-40 ~]$ df -h ,df-Th       df -Th | grep "^/dev"
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        386M     0  386M   0% /dev
+tmpfs           408M     0  408M   0% /dev/shm
+tmpfs           408M   11M  398M   3% /run
+tmpfs           408M     0  408M   0% /sys/fs/cgroup
+/dev/xvda2       10G  1.2G  8.9G  12% /
+tmpfs            82M     0   82M   0% /run/user/1000
+Now it is row disk that's why it is not showing 
+-------------------------------------------------
+Now do the partiotion 
+-------
+fdisk /dev/xvdf
+m
+n  -For new partition
+p- For primary
+partition number:1-4
+w -write and save 
+Now check 
+==========
+[root@ip-172-16-1-40 ec2-user]# lsblk
+NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+xvda    202:0    0  10G  0 disk
+├─xvda1 202:1    0   1M  0 part
+└─xvda2 202:2    0  10G  0 part /
+xvdf    202:80   0   5G  0 disk
+└─xvdf1 202:81   0   5G  0 part      ======>Now it is showing previously not 
+Now format the disk 
+--------------------
+mkfs.ext4 /dev/xvdf or mkfs.xfs -f /dev/xvdf or mkfs.xfs /dev/xvdf
+
+Create directory
+mkdir /abhiram
+Now Mount
+----------
+mount /dev/xvdf /abhiram
+
+Now check 
+----------
+[root@ip-172-16-1-40 ec2-user]# lsblk
+NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+xvda    202:0    0  10G  0 disk
+├─xvda1 202:1    0   1M  0 part
+└─xvda2 202:2    0  10G  0 part /
+xvdf    202:80   0   5G  0 disk /home/ec2-user/abiram
+[root@ip-172-16-1-40 ec2-user]# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        386M     0  386M   0% /dev
+tmpfs           408M     0  408M   0% /dev/shm
+tmpfs           408M   11M  398M   3% /run
+tmpfs           408M     0  408M   0% /sys/fs/cgroup
+/dev/xvda2       10G  1.2G  8.9G  12% /
+tmpfs            82M     0   82M   0% /run/user/1000
+/dev/xvdf       4.9G   20M  4.6G   1% /home/ec2-user/abiram
+MOUNT PERMANTLY
+===================
+vi /etc/fstab
+
+/dev/sda	/abhiram	ext4	defaults	0 0
+
+
+
+ 
+
+
+
+
+
+
+
+
