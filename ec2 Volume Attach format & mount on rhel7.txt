@@ -1,4 +1,4 @@
-DISK PARTITION ON AWS RHEL 7 
+DISK PARTITION ON AWS RHEL 7     (Before doing take the ebs volume backup & Ami Image back up {snapshot})
 =================================
 [root@ip-172-16-1-40 ec2-user]# clear
 [root@ip-172-16-1-40 ec2-user]# fdisk -l
