@@ -1,0 +1,57 @@
+ec2 root volume extend rhel7
+-----------------------
+Before do anything take Image backup of that machine also take ebs volume snapsnot 
+Caution :if it is prod server at the time of AMI image backup few secound machime will be stuck
+& will get outage 
+-----------
+1-- Go to the volumes-->Select the volume-->Action--->Modify Volume 
+2 - Now take puty console & check ( i extended 10gb to 12gb)
+[root@ip-172-16-1-41 ~]# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        472M     0  472M   0% /dev
+tmpfs           495M     0  495M   0% /dev/shm
+tmpfs           495M   13M  482M   3% /run
+tmpfs           495M     0  495M   0% /sys/fs/cgroup
+/dev/xvda2       10G  944M  9.1G  10% /  ----------------------->Here 10GB
+tmpfs            99M     0   99M   0% /run/user/1000
+--------------------------------------
+[root@ip-172-16-1-41 ~]# lsblk           (lsblk -lf)
+NAME    MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+xvda    202:0    0  12G  0 disk  --------------------------> Here 12gb we need to  expand it 
+├─xvda1 202:1    0   1M  0 part
+└─xvda2 202:2    0  10G  0 part /
++++++++++++++++++++++++++++++++++++++++++++++++++
+Expand it using below command 
+~]# growpart /dev/xvda 2
+CHANGED: partition=2 start=4096 old: size=20967390 end=20971486 new: size=25161694 end=25165790
+-------------------------------------
+Now u can see both partition is 20gb 
+xvda    202:0    0  12G  0 disk
+├─xvda1 202:1    0   1M  0 part
+└─xvda2 202:2    0  12G  0 part /
+-----------------------
+devtmpfs        472M     0  472M   0% /dev
+tmpfs           495M     0  495M   0% /dev/shm
+tmpfs           495M   13M  482M   3% /run
+tmpfs           495M     0  495M   0% /sys/fs/cgroup
+/dev/xvda2       10G  944M  9.1G  10% /  -------------------------------->Still 10gb
+tmpfs            99M     0   99M   0% /run/user/1000
++++++++++++++++++++++++++++++++++
+resize2fs /dev/xvda2 or xfs_growfs /dev/xvda2
+++++++++++++++++++++++++++++++++++++++++++=
+Now check 
+[root@ip-172-16-1-41 ~]# df -h
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        472M     0  472M   0% /dev
+tmpfs           495M     0  495M   0% /dev/shm
+tmpfs           495M   13M  482M   3% /run
+tmpfs           495M     0  495M   0% /sys/fs/cgroup
+/dev/xvda2       12G  944M   12G   8% /   ------------------------------->Now 12gb
+tmpfs            99M     0   99M   0% /run/user/1000
+
+
+Done 
+
+
+
+
