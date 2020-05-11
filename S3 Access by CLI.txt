@@ -1,0 +1,55 @@
+Aws s3 Access by CLI ubuntu 18.4
+-----------------------
+1-Create IAM user & add to group or without group
+2- Download access key id and password 
+3- Launch a Ec2 instance & check aws cli is installed or not (aws --version)
+if not install.
+4- Then start using command 
+root@ip-172-16-1-121:~# aws configure
+AWS Access Key ID [None]: AKIAZF62XQK5EDNZG3U2
+AWS Secret Access Key [None]: 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
+Default region name [None]:    (Enter or put Region Name )
+Default output format [None]:   (Enter )
+root@ip-172-16-1-121:~# aws s3 help
+Create a bucket
+----------------
+#aws s3 mb help
+root@ip-172-16-1-121:~# aws s3 mb s3://maa115
+make_bucket: maa115   (Bucket is created sucessfull)
+List the bucket
+-----------
+aws s3 ls   --cmd check
+(Go graphical mode and check created or not )
+Now try to upload file from your machine 
+----------------------------------------
+ls -ltra
+ aws s3 cp abhiram s3://maa115/
+upload: ./abhiram to s3://maa115/abhiram
+Now check what is inside the bucket 
+-----------------------------------
+root@ip-172-16-1-121:~# aws s3 ls s3://maa115/
+2020-05-11 09:18:23         30 abhiram
+
+Now try to download 
+------------------
+root@ip-172-16-1-121:~# aws s3 cp s3://maa115/abhiram /home/
+download: s3://maa115/abhiram to ../home/abhiram
+root@ip-172-16-1-121:~# cd /home/
+root@ip-172-16-1-121:/home# ls
+abhiram  ubuntu
+-------------
+Delete the file in S3 Bucket
+-------------------------
+root@ip-172-16-1-121:~# aws s3 rm s3://maa115/abhiram   (maa115-  is bucket name , abhiram -is file name)
+delete: s3://maa115/abhiram
+Delete a Bucket 
+---------------
+root@ip-172-16-1-121:~# aws s3 rb s3://maa115
+remove_bucket: maa115
+root@ip-172-16-1-121:~# aws s3 ls
+2020-05-10 08:30:07 abhiram321
+2020-05-10 09:28:17 abhiram54321
+
+URL -https://www.youtube.com/watch?v=4phTbiG5Dgg
+
+
