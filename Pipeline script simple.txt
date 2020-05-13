@@ -1,7 +1,7 @@
 
 URL:https://www.youtube.com/watch?v=_o42ZCkCJb4&t=6s
 Pipeline 
-------
+-----------------------
 scripted pipeline concept 
 node  (u need to specify where u will run the dcripy masternode or slave node )
 {
