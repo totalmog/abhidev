@@ -1,0 +1,47 @@
+
+URL:https://www.youtube.com/watch?v=_o42ZCkCJb4&t=6s
+Pipeline 
+------
+scripted pipeline concept 
+node  (u need to specify where u will run the dcripy masternode or slave node )
+{
+   Stage('checkout')              (Inside the node element we have stage element ,Stage  is a block which define subset of task through the entire pipeline ,like we have build,
+{                                  static code analysis code review ,packaging ,delivery that can bestages jenkins pipeline)
+}                           (setup action u want to perform on stage , i wnat to checkout but dont know how to write pipeline ,so simple thing pipeline syntax click on it 
+}    
+
+
+
+EX
+def workspace;
+node
+{stage('checkout')
+{
+    checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: '1bcf0b2b-aa56-430c-9187-4b3bf431b6ec', url: 'https://github.com/totalmog/dev.git']]])
+    worksapce =pwd()
+}
+    stage ('static code analysis')
+    {
+        echo"static code analysis"
+    }
+    stage ('Build')
+    {
+        echo"Build the code"
+    }
+    stage ('Unit testing')
+    {
+        echo"Unit testing"
+    }
+    stage ('Delivery')
+    {
+        echo "Deliver the code"
+    }
+    
+}
+
+--------
+Save and build now 
+How to store this code into souce code managemt repository
++++++++++++++++++++++++++++++++++++++++++++++++++
+Copy this file and go to your repository and make file name jenkinsfile 
+                
