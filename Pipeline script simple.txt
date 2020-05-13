@@ -1,5 +1,5 @@
 
-URL:https://www.youtube.com/watch?v=_o42ZCkCJb4&t=6s
+URL:https://www.youtube.com/watch?v=_o42ZCkCJb4&t=6s , https://www.youtube.com/watch?v=n9DJwtPy02E
 Pipeline 
 -----------------------
 scripted pipeline concept 
