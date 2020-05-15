@@ -1,0 +1,144 @@
+https://www.youtube.com/watch?v=Rp9-gegjuuQ
+Kubernetes installation on RHEL 7.6 on ec2    (14.5.2020)
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Master node would be 2 cpu minimum
+yum update -y
+Set the ec2-user and root password 
+sudo passwd ec2-user
+sudo passwd root
+----------------------
+set hostname both node
+-----
+hostnamectl set-hostname master-node
+go to the vi /etc/ssh/sshd_config  
+PasswordAuthentication yes  (Save the file)
+systemctl stop sshd ,systemctl start sshd  (Means it will not need the ppk file)
+Now make entry ip in hostfile
+----------------------------
+#172.16.1.82 ------Master private ip
+#172.16.1.170----- Workernode private ip
+cat <<EOF>> /etc/hosts
+172.16.1.82 master-node
+172.16.1.170 worker-node-1
+EOF
+# Check cat /etc/hosts
+Disable your local repository using th below command 
+-----------------------------------------------
+setenforce 0 or 
+sed -i --follow-symlinks 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+Rebbot now 
+#  getenforce  (it will show disabled) 
+#[root@master-node ~]# getenforce
+#Disabled
+systemctl stop firewalld
+systemctl disable firewalld
+yum-config-manager --disable kubernetes (Means it disable yum manager please do not try to run kubernetes from local repository)
+amazon does not have any kubernetes 
+
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+exclude=kubelet kubeadm kubectl
+EOF
+
+[root@master-node ~]# yum-config-manager --save -setopt=kubernetes.skip_if_unavailable=true
+Loaded plugins: amazon-id
+Usage: yum-config-manager [options] [section ...]
+
+Command line error: no such option: -s
+
+Now install docker and kubeadm both node
+--------------------------------
+yum install docker -y   (Getting error )
+solution
+-------
+step-1:yum install http://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+atep-2:yum update 
+yum install yum-utils
+step-3: Add Docker CE to yum repos.
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum install docker-ce  (error 2:274)
+wget http://mirror.centos.org/centos/7/extras/x86_64/Packages/container-selinux-2.107-3.el7.noarch.rpm
+rpm -ivh container-selinux-2.107-3.el7.noarch.rpm
+yum install docker-ce
+systemctl start docker
+systemctl enable docker
+systemctl status docker
+
+docker -v
+-------------
+vi /etc/yum.repos.d/kubernetes.repo
+repo_gpgcheck=0    (means it will not check the signature .problem is that virus may attack)
+
+[root@master-node ~]# yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes  
+   
+systemctl start kubelet                                                                                          
+systemctl enable kubelet
+systemctl status kubelet
+Check the kubeadm version
+-------------
+ kubeadm version
+kubeadm version: &version.Info{Major:"1", Minor:"18", GitVersion:"v1.18.2", GitCommit:"52c56ce7a8272c798dbc29846288d7cd9fbae032", GitTreeState:"clean", BuildDate:"2020-04-16T11:54:15Z", GoVersion:"go1.13.9", Compiler:"gc", Platform:"linux/amd64"}
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Initialize Kubernetes on the master node
+========================================
+swapoff -a   (permantly in /etc/fstab)
+kubeadm init --apiserver-advertise-address=172.16.1.82 --pod-network-cidr=192.168.0.0/16 --ignore-preflight-errors=NumCPU
+                                           (Master Node ip)               (POD Network)
+
+
+ mkdir -p $HOME/.kube                                            (Save the token to add the nodes)
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Deploy a Pod Network through the master node
+-----------------------------------------------
+kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+
+
+
+kubectl get node
+kubectl get pod --all-namespaces 
++++++++++++++++++++++++++++++++++++++++
+Add the slave node to the network in order to form a cluster
+----------------------------------------------------------
+Add the token now 
+if u are getting cgroup issue use below cmd 
+vim /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+Environment=”cgroup-driver=systemd/cgroup-driver=cgroupfs”
+systemctl restart docker && systemctl enable docker 
+systemctl restart kubelet && systemctl enable kubelet 
+----------
+If getting error 
+-----------
+Follow below url 
+https://kubernetes.io/docs/setup/production-environment/container-runtimes/#cgroup-drivers
+after that
+----------
+vi /etc/sysctl.conf                   (https://www.youtube.com/watch?v=JRKUquLuncE)
+add below two line 
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+save and reboot the machine 
+Now add the token 
++++++++++++++++++++++++++++++++++++++
+Now check on master kubectl get nodes
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
