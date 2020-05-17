@@ -1,0 +1,105 @@
+Empty dir and EBS VOLume persistent storage 
+=============================================
+Empty Dir     (https://www.alibabacloud.com/blog/kubernetes-volume-basics-emptydir-and-persistentvolume_594834)
++++++++++++++++        (https://www.youtube.com/watch?v=ovTvdPUr-ZM)
+vi volumepod.yml
+
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: myvolumes-pod
+spec:
+  containers:
+  - image: alpine
+    imagePullPolicy: IfNotPresent
+    name: myvolumes-container-1
+    
+    command: ['sh', '-c', 'echo The Bench Container 1 is Running ; sleep 3600']
+    
+    volumeMounts:
+    - mountPath: /demo1
+      name: demo-volume
+
+  - image: alpine
+    imagePullPolicy: IfNotPresent
+    name: myvolumes-container-2
+    
+    command: ['sh', '-c', 'echo The Bench Container 2 is Running ; sleep 3600']
+    
+    volumeMounts:
+    - mountPath: /demo2
+      name: demo-volume
+
+  - image: alpine
+    imagePullPolicy: IfNotPresent
+    name: myvolumes-container-3
+    
+    command: ['sh', '-c', 'echo The Bench Container 3 is Running ; sleep 3600']
+    
+    volumeMounts:
+    - mountPath: /demo3
+      name: demo-volume
+
+  volumes:
+  - name: demo-volume
+    emptyDir: {}
+    -----------
+kubectl create -f myVolumes-Pod.yaml
+--------------
+kubectl exec myvolumes-pod -c myvolumes-container-1 -it -- /bin/sh
+/ ls 
+df -h
+cd /demo1
+touch abhiram
+exit 
+++++++++++++++++++++++++++++++++++++++++++
+Persistant storage using EBS Volume    (https://containerjournal.com/topics/container-networking/using-ebs-and-efs-as-persistent-volume-in-kubernetes/) 
+____________________________________________________     Reference Url  (https://docs.openshift.com/enterprise/3.1/install_config/persistent_storage/persistent_storage_aws.html)
+vi persistent.yml
+
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: pv3
+  labels:
+    type: amazonEBS
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+    - ReadWriteOnce
+  awsElasticBlockStore:
+    volumeID: vol-06efc89db634dbed0
+    fsType: ext4
+
+----------------------
+[root@master-node ~]# kubectl get pv
+NAME   CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS      CLAIM   STORAGECLASS   REASON   AGE
+pv3    5Gi        RWO            Retain           Available                                   40s
+-------------------------------------------  kubectl describe pv pv3
+Create a PVC to claim the PV:
+====================================
+vi persipvc.yml
+
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: omm-pvc
+  labels:
+    type: amazonEBS
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+===========
+kubectl create -f persipvc.yml
+[root@master-node ~]# kubectl get pvc
+NAME      STATUS   VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+omm-pvc   Bound    pv3      5Gi        RWO                           11s
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Now Deploy the pod using pvc 
+-----------------------------
+
