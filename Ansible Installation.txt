@@ -1,0 +1,70 @@
+Anisible Instalaltion on rhel 7.6
+--------------------------
+Step-1- Yum ypdate -y   (This is Ansible controller machine )
+rpm -Uvh https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm (For ansible repository)
+yum install ansible -y 
+ansible --version 
+/etc/ansible/hosts  --> Inventory file 
+/etc/ansible/ansible.cfg  -->Ansible configuration file 
+Step-2-create a user for Ansible administrator and grsnt thr access 
+#Useradd Ansible 
+#passwd Ansible
+visudo
+#includedir /etc/sudoers.d
+ec2-user        ALL=(ALL)       NOPASSWD: ALL
+Ansible         ALL=(ALL)       NOPASSWD: ALL
+-----------
+Create user and give visudo permission on other machines 
+Create same user all the machine
+Step-3 
+Login as Ansible user on the master node and generate ssh key
+------
+[Ansible@master ec2-user]$ ssh-keygen
+ls -la 
+cd .ssh
+ls 
+Now copy the ssh pub key to the client machine 
+-----
+ssh-copy-id 172.16.1.245 (client server ip)
+Now login from master machine 
+[Ansible@master .ssh]$ ssh 172.16.1.245   (it will not ask passwd)
+[Ansible@worker ~]$
+exit 
+-----
+Now your plybook will work 
+In master machine add the inventory of client machine 
+[Ansible@master ~]$ sudo vi /etc/ansible/hosts
+[Servers]
+172.16.1.245   ---This is the client machine ip
+[Ansible@master .ssh]$ ansible all -m ping
+--=========
+Sample ex:
+Copy file from master to cline t machine 
+[Ansible@master ~]$ ansible all -m copy -a "src=/home/Ansible/hello.html dest=/home/Ansible"
+Reboot
+-----
+ansible all -a "/sbin/reboot"
+create user
+---------
+ansible all -m user -a "name=abhiram password=<encrypted password>"
+remove user
+------------
+ansible all -m user -a "name=abhiram state=absent"
+change file permission
+---------------------
+ansible all -m file -a "dest=/home/abhi/file1.txt mode=777"
+Install package
+------------------
+ansible all -m yum -a "name=httpd state=latest"
+start a service
+-----------------
+ansible all -m service -a "name=httpd state=started"
+ansible all -m service -a "name=httpd state=stopped"
+
+
+
+
+ 
+
+
+
